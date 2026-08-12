@@ -1,6 +1,6 @@
-# 6-Channel-Servo-Tester Documentation
+# 4-Ch Knob Line Follower Documentation
 
-This repository contains the 6-Channel-Servo-Tester VitePress documentation site. The
+This repository contains the 4-Ch Knob Line Follower VitePress documentation site. The
 documentation source files are Markdown files under `docs/docs/`.
 
 ## Local development
@@ -19,7 +19,7 @@ npm run docs:build
 npm run docs:stage-main
 ```
 
-The staged production files are generated in `projects/6-Channel-Servo-Tester/en/latest/`.
+The staged production files are generated in `projects/4-Ch Knob Line Follower/en/latest/`.
 
 ## GitHub Pages deployment
 
@@ -30,11 +30,11 @@ The build artifacts under `projects/` are committed to the repository. Open
 The GitHub Pages direct URL is:
 
 ```text
-https://GITHUB-USERNAME.github.io/6-Channel-Servo-Tester-vite/projects/6-Channel-Servo-Tester/en/latest/
+https://GITHUB-USERNAME.github.io/4-Ch Knob Line Follower-vite/projects/4-Ch Knob Line Follower/en/latest/
 ```
 
 The public-facing URL (via the baota Nginx reverse proxy) is:
 
 ```text
-https://wiki-test.hiwonder.com/projects/6-Channel-Servo-Tester/en/latest/
+https://wiki-test.hiwonder.com/projects/4-Ch Knob Line Follower/en/latest/
 ```

@@ -82,8 +82,53 @@ function initMenu() {
 }
 
 // 根据场景选择执行时机
+function sortVersionSelector() {
+    const select = document.querySelector('.version-switch select');
+    if (!select) {
+        return false;
+    }
+
+    const versionOrder = new Map([
+        ['latest', 0],
+        ['starter-kit', 1],
+        ['standard-kit', 2],
+        ['ultimate-kit', 3],
+    ]);
+    const selectedValue = select.value;
+    const options = Array.from(select.options).map((option, index) => ({
+        option,
+        index,
+        rank: versionOrder.get(option.textContent.trim().toLowerCase())
+            ?? Number.MAX_SAFE_INTEGER,
+    }));
+
+    options
+        .sort((left, right) => left.rank - right.rank || left.index - right.index)
+        .forEach(({ option }) => select.appendChild(option));
+    select.value = selectedValue;
+
+    return true;
+}
+
+function initVersionSelector() {
+    if (sortVersionSelector()) {
+        return;
+    }
+
+    const observer = new MutationObserver(() => {
+        if (sortVersionSelector()) {
+            observer.disconnect();
+        }
+    });
+
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    window.setTimeout(() => observer.disconnect(), 10000);
+}
+
 if (document.readyState === 'complete') {
     initMenu();
+    initVersionSelector();
 } else {
     window.addEventListener('load', initMenu);
+    window.addEventListener('load', initVersionSelector);
 }

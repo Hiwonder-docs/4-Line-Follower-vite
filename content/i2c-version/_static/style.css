@@ -47,7 +47,7 @@ section p {
 .wy-nav-side .wy-menu-vertical li.toctree-l2 button.toctree-expand{
     pointer-events:none;
 }
-.wy-menu-vertical > ul > li:last-child >a{
+.wy-menu-vertical > ul:last-child > li:last-child >a{
     display: block;
     width: fit-content;
     margin: 1.618em;
@@ -172,7 +172,18 @@ table {
     border-bottom: 1px solid #e1e4e5;
     border-left: 1px solid #e1e4e5;
 }
+iframe[title="Assembly Guide PDF"] {
+  display: block;
+  width: 100%;
+  height: min(850px, 80vh);
+  border: 1px solid #d9d9d9;
+}
 
+@media (max-width: 768px) {
+  iframe[title="Assembly Guide PDF"] {
+    height: 70vh;
+  }
+}
 @media screen and (min-width: 1400px) {
     .wy-grid-for-nav .wy-nav-side, .wy-grid-for-nav .wy-side-nav-search, .wy-grid-for-nav .wy-menu {
         width: 320px;

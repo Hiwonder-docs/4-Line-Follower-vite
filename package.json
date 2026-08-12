@@ -1,12 +1,16 @@
 {
   "scripts": {
     "docs:dev": "vitepress dev docs",
+    "dev:latest": "node scripts/dev_version.mjs latest",
+    "dev:i2c-version": "node scripts/dev_version.mjs i2c-version",
+    "dev:gpio-version": "node scripts/dev_version.mjs gpio-version",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "docs:stage-main": "node scripts/stage_main_site.mjs",
-    "build:gpio": "node scripts/build_version.mjs gpio-version",
-    "build:i2c": "node scripts/build_version.mjs i2c-version",
-    "build:all": "node scripts/build_version.mjs gpio-version && node scripts/build_version.mjs i2c-version"
+    "build:latest": "node scripts/build_version.mjs latest",
+    "build:i2c-version": "node scripts/build_version.mjs i2c-version",
+    "build:gpio-version": "node scripts/build_version.mjs gpio-version",
+    "build:all": "node scripts/build_version.mjs latest && node scripts/build_version.mjs i2c-version && node scripts/build_version.mjs gpio-version"
   },
   "dependencies": {
     "vitepress": "^1.6.4"
