@@ -16,59 +16,92 @@ const VERSION_LABELS: Record<string, string> = {
   'i2c-version': 'I2C Version'
 }
 
-const isVersionMenuOpen = ref(false)
-
-function detectCurrentVersion(path: string) {
-  const decodedPath = decodePath(path)
-  return ALL_VERSIONS.find((version) => decodedPath.includes(`/en/${version}/`)) || ALL_VERSIONS[0]
+function detectCurrentVersion(): string {
+  if (!inBrowser) return ALL_VERSIONS[0]
+  for (const v of ALL_VERSIONS) {
+    if (location.pathname.includes(`/en/${v}/`)) return v
+  }
+  return ALL_VERSIONS[0]
 }
 
-const currentVersion = computed(() => {
-  const path = inBrowser ? window.location.pathname : withBase('/')
-  route.path
-  return detectCurrentVersion(path)
-})
+function injectVersionSwitcher() {
+  if (!inBrowser) return
+  const navList = document.querySelector('.VPNavBarMenu')
+  if (!navList) return
+  if (navList.querySelector('.version-switcher')) return
 
-const currentVersionLabel = computed(() => VERSION_LABELS[currentVersion.value] || currentVersion.value)
+  const current = detectCurrentVersion()
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const li = document.createElement('li')
+  li.className = 'version-switcher'
+  const itemsHtml = ALL_VERSIONS
+    .map(v => `<li class="version-switcher__item ${current === v ? 'is-selected' : ''}" data-version="${v}">${VERSION_LABELS[v]}</li>`)
+    .join('')
+
+  li.innerHTML = `
+    <span class="version-switcher__label">Version</span>
+    <button type="button" class="version-switcher__trigger">
+      <span class="version-switcher__name">${VERSION_LABELS[current]}</span>
+    </button>
+    <ul class="version-switcher__menu" style="display:none">
+      ${itemsHtml}
+    </ul>
+  `
+
+  const trigger = li.querySelector('.version-switcher__trigger') as HTMLButtonElement
+  const menu = li.querySelector('.version-switcher__menu') as HTMLElement
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation()
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none'
+  })
+
+  document.addEventListener('click', (e) => {
+    if (!li.contains(e.target as Node)) menu.style.display = 'none'
+  })
+
+  li.querySelectorAll('.version-switcher__item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const ver = (item as HTMLElement).dataset.version!
+      if (ver !== current) {
+        const versionRootPattern = new RegExp(`/en/${current}(?:/.*)?$`)
+        const newPath = location.pathname.replace(versionRootPattern, `/en/${ver}/`)
+        window.location.replace(newPath)
+      }
+      menu.style.display = 'none'
+    })
+  })
+
+  navList.insertBefore(li, navList.firstChild)
 }
 
-function getVersionUrl(version: string) {
-  const fallbackUrl = `/projects/4-Ch-Knob-Line-Follower/en/${version}/`
+function interceptCrossVersionLinks() {
+  if (!inBrowser) return
+  document.addEventListener('click', (e) => {
+    const link = (e.target as HTMLElement)?.closest('a') as HTMLAnchorElement | null
+    if (!link) return
 
-  if (!inBrowser) {
-    const base = withBase('/')
-    const current = detectCurrentVersion(base)
-    return base.replace(new RegExp(`/en/${escapeRegExp(current)}/?$`), `/en/${version}/`) || fallbackUrl
-  }
+    const href = link.getAttribute('href') || ''
+    if (!href || href.startsWith('http://') || href.startsWith('https://')) return
 
-  const current = currentVersion.value
-  const versionRootPattern = new RegExp(`/en/${escapeRegExp(current)}(?:/.*)?$`)
+    const currentVersion = detectCurrentVersion()
+    const otherVersions = ALL_VERSIONS.filter(v => v !== currentVersion)
 
-  if (versionRootPattern.test(window.location.pathname)) {
-    return window.location.pathname.replace(versionRootPattern, `/en/${version}/`)
-  }
-
-  return fallbackUrl
-}
-
-function selectVersion(version: string) {
-  isVersionMenuOpen.value = false
-
-  if (!inBrowser || version === currentVersion.value) {
-    return
-  }
-
-  window.location.href = getVersionUrl(version)
-}
-
-function closeVersionMenu(event: MouseEvent) {
-  const target = event.target as HTMLElement | null
-  if (!target?.closest('.version-switcher')) {
-    isVersionMenuOpen.value = false
-  }
+    for (const otherVersion of otherVersions) {
+      if (href.includes(`/en/${otherVersion}/`)) {
+        e.preventDefault()
+        e.stopPropagation()
+        const origin = window.location.origin
+        const targetPath = href.startsWith('/')
+          ? href
+          : new URL(href, window.location.href).pathname
+        window.location.replace(origin + targetPath)
+        break
+      }
+    }
+  }, true)
 }
 
 function decodePath(path: string) {
@@ -1057,8 +1090,9 @@ onMounted(() => {
   window.addEventListener('resize', scheduleNearViewportPreload)
   document.addEventListener('click', handleLightboxDocumentClick)
   document.addEventListener('keydown', handleLightboxDocumentKeydown)
-  document.addEventListener('click', closeVersionMenu)
   patchLogoLink()
+  injectVersionSwitcher()
+  interceptCrossVersionLinks()
   scheduleImageEnhancement()
   scheduleModuleEnhancement()
 })
@@ -1071,7 +1105,7 @@ watch(
     resetLazyImageRuntime(getDocRoot())
     await nextTick()
     patchLogoLink()
-    isVersionMenuOpen.value = false
+    injectVersionSwitcher()
     scheduleImageEnhancement()
     scheduleModuleEnhancement()
   }
@@ -1085,55 +1119,12 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', scheduleNearViewportPreload)
   document.removeEventListener('click', handleLightboxDocumentClick)
   document.removeEventListener('keydown', handleLightboxDocumentKeydown)
-  document.removeEventListener('click', closeVersionMenu)
 })
 </script>
 
 <template>
   <PageRedirect v-if="isRedirectPage" />
-  <component :is="DefaultTheme.Layout" v-else>
-    <template #nav-bar-content-before>
-      <div class="version-switcher" :class="{ 'is-open': isVersionMenuOpen }">
-        <button
-          type="button"
-          class="version-switcher__trigger"
-          :aria-expanded="isVersionMenuOpen"
-          aria-haspopup="true"
-          @click.stop="isVersionMenuOpen = !isVersionMenuOpen"
-        >
-          <span class="version-switcher__label">Version</span>
-          <span class="version-switcher__name">{{ currentVersionLabel }}</span>
-          <span class="version-switcher__chevron" aria-hidden="true"></span>
-        </button>
-        <div class="version-switcher__menu">
-          <a
-            v-for="version in ALL_VERSIONS"
-            :key="version"
-            class="version-switcher__item"
-            :class="{ 'is-selected': version === currentVersion }"
-            :href="getVersionUrl(version)"
-            @click.prevent="selectVersion(version)"
-          >
-            {{ VERSION_LABELS[version] }}
-          </a>
-        </div>
-      </div>
-    </template>
-    <template #nav-screen-content-before>
-      <div class="version-switcher version-switcher--screen">
-        <a
-          v-for="version in ALL_VERSIONS"
-          :key="version"
-          class="version-switcher__item"
-          :class="{ 'is-selected': version === currentVersion }"
-          :href="getVersionUrl(version)"
-          @click.prevent="selectVersion(version)"
-        >
-          {{ VERSION_LABELS[version] }}
-        </a>
-      </div>
-    </template>
-  </component>
+  <component :is="DefaultTheme.Layout" v-else />
   <slot name="layout-bottom" />
   <ImageViewer
     v-if="lightboxSrc"
