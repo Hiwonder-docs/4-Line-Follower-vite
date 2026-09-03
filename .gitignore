@@ -1,5 +1,6 @@
 node_modules/
 docs/.vitepress/dist/
+docs/.vitepress/.temp/
 docs/docs/
 docs/_static/
 *.log

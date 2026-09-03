@@ -9,6 +9,68 @@ import FeedbackWidget from './FeedbackWidget.vue'
 const { frontmatter } = useData()
 const route = useRoute()
 
+const ALL_VERSIONS = ['latest', 'gpio-version', 'i2c-version']
+const VERSION_LABELS: Record<string, string> = {
+  latest: 'Latest',
+  'gpio-version': 'GPIO Version',
+  'i2c-version': 'I2C Version'
+}
+
+const isVersionMenuOpen = ref(false)
+
+function detectCurrentVersion(path: string) {
+  const decodedPath = decodePath(path)
+  return ALL_VERSIONS.find((version) => decodedPath.includes(`/en/${version}/`)) || ALL_VERSIONS[0]
+}
+
+const currentVersion = computed(() => {
+  const path = inBrowser ? window.location.pathname : withBase('/')
+  route.path
+  return detectCurrentVersion(path)
+})
+
+const currentVersionLabel = computed(() => VERSION_LABELS[currentVersion.value] || currentVersion.value)
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function getVersionUrl(version: string) {
+  const fallbackUrl = `/projects/4-Ch-Knob-Line-Follower/en/${version}/`
+
+  if (!inBrowser) {
+    const base = withBase('/')
+    const current = detectCurrentVersion(base)
+    return base.replace(new RegExp(`/en/${escapeRegExp(current)}/?$`), `/en/${version}/`) || fallbackUrl
+  }
+
+  const current = currentVersion.value
+  const versionRootPattern = new RegExp(`/en/${escapeRegExp(current)}(?:/.*)?$`)
+
+  if (versionRootPattern.test(window.location.pathname)) {
+    return window.location.pathname.replace(versionRootPattern, `/en/${version}/`)
+  }
+
+  return fallbackUrl
+}
+
+function selectVersion(version: string) {
+  isVersionMenuOpen.value = false
+
+  if (!inBrowser || version === currentVersion.value) {
+    return
+  }
+
+  window.location.href = getVersionUrl(version)
+}
+
+function closeVersionMenu(event: MouseEvent) {
+  const target = event.target as HTMLElement | null
+  if (!target?.closest('.version-switcher')) {
+    isVersionMenuOpen.value = false
+  }
+}
+
 function decodePath(path: string) {
   try {
     return decodeURI(path)
@@ -995,6 +1057,7 @@ onMounted(() => {
   window.addEventListener('resize', scheduleNearViewportPreload)
   document.addEventListener('click', handleLightboxDocumentClick)
   document.addEventListener('keydown', handleLightboxDocumentKeydown)
+  document.addEventListener('click', closeVersionMenu)
   patchLogoLink()
   scheduleImageEnhancement()
   scheduleModuleEnhancement()
@@ -1008,6 +1071,7 @@ watch(
     resetLazyImageRuntime(getDocRoot())
     await nextTick()
     patchLogoLink()
+    isVersionMenuOpen.value = false
     scheduleImageEnhancement()
     scheduleModuleEnhancement()
   }
@@ -1021,12 +1085,55 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', scheduleNearViewportPreload)
   document.removeEventListener('click', handleLightboxDocumentClick)
   document.removeEventListener('keydown', handleLightboxDocumentKeydown)
+  document.removeEventListener('click', closeVersionMenu)
 })
 </script>
 
 <template>
   <PageRedirect v-if="isRedirectPage" />
-  <component :is="DefaultTheme.Layout" v-else />
+  <component :is="DefaultTheme.Layout" v-else>
+    <template #nav-bar-content-before>
+      <div class="version-switcher" :class="{ 'is-open': isVersionMenuOpen }">
+        <button
+          type="button"
+          class="version-switcher__trigger"
+          :aria-expanded="isVersionMenuOpen"
+          aria-haspopup="true"
+          @click.stop="isVersionMenuOpen = !isVersionMenuOpen"
+        >
+          <span class="version-switcher__label">Version</span>
+          <span class="version-switcher__name">{{ currentVersionLabel }}</span>
+          <span class="version-switcher__chevron" aria-hidden="true"></span>
+        </button>
+        <div class="version-switcher__menu">
+          <a
+            v-for="version in ALL_VERSIONS"
+            :key="version"
+            class="version-switcher__item"
+            :class="{ 'is-selected': version === currentVersion }"
+            :href="getVersionUrl(version)"
+            @click.prevent="selectVersion(version)"
+          >
+            {{ VERSION_LABELS[version] }}
+          </a>
+        </div>
+      </div>
+    </template>
+    <template #nav-screen-content-before>
+      <div class="version-switcher version-switcher--screen">
+        <a
+          v-for="version in ALL_VERSIONS"
+          :key="version"
+          class="version-switcher__item"
+          :class="{ 'is-selected': version === currentVersion }"
+          :href="getVersionUrl(version)"
+          @click.prevent="selectVersion(version)"
+        >
+          {{ VERSION_LABELS[version] }}
+        </a>
+      </div>
+    </template>
+  </component>
   <slot name="layout-bottom" />
   <ImageViewer
     v-if="lightboxSrc"
