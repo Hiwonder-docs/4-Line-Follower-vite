@@ -5,16 +5,13 @@ import { inBrowser, useData, useRoute, withBase } from 'vitepress'
 import PageRedirect from './PageRedirect.vue'
 import ImageViewer from './ImageViewer.vue'
 import FeedbackWidget from './FeedbackWidget.vue'
+import { getVersionLabels, getVersionNames, getVersionUrl } from '../site.config.mjs'
 
 const { frontmatter } = useData()
 const route = useRoute()
 
-const ALL_VERSIONS = ['latest', 'gpio-version', 'i2c-version']
-const VERSION_LABELS: Record<string, string> = {
-  latest: 'Latest',
-  'gpio-version': 'GPIO Version',
-  'i2c-version': 'I2C Version'
-}
+const ALL_VERSIONS = getVersionNames()
+const VERSION_LABELS: Record<string, string> = getVersionLabels()
 
 function detectCurrentVersion(): string {
   if (!inBrowser) return ALL_VERSIONS[0]
@@ -66,9 +63,7 @@ function injectVersionSwitcher() {
       e.stopPropagation()
       const ver = (item as HTMLElement).dataset.version!
       if (ver !== current) {
-        const versionRootPattern = new RegExp(`/en/${current}(?:/.*)?$`)
-        const newPath = location.pathname.replace(versionRootPattern, `/en/${ver}/`)
-        window.location.replace(newPath)
+        window.location.replace(`${window.location.origin}${getVersionUrl(ver)}`)
       }
       menu.style.display = 'none'
     })

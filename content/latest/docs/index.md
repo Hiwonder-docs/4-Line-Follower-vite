@@ -1,6 +1,6 @@
 ---
 layout: page-redirect
-redirectTo: /docs/1.ArmPi_Ultra_User_Manual.html
+redirectTo: /docs/1_NexArm_Tutorial.html
 ---
 
-Redirecting to content page...
+正在跳转到内容页面...

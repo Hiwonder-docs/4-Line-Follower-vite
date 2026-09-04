@@ -1,16 +1,18 @@
 {
   "scripts": {
-    "docs:dev": "vitepress dev docs",
+    "docs:dev": "node scripts/dev_version.mjs latest",
     "dev:latest": "node scripts/dev_version.mjs latest",
-    "dev:i2c-version": "node scripts/dev_version.mjs i2c-version",
-    "dev:gpio-version": "node scripts/dev_version.mjs gpio-version",
-    "docs:build": "vitepress build docs",
+    "dev:esp32-version": "node scripts/dev_version.mjs esp32-version",
+    "dev:imitation-learning-version": "node scripts/dev_version.mjs imitation-learning-version",
+    "dev:ros-version": "node scripts/dev_version.mjs ros-version",
+    "docs:build": "node scripts/build_version.mjs latest",
     "docs:preview": "vitepress preview docs",
     "docs:stage-main": "node scripts/stage_main_site.mjs",
     "build:latest": "node scripts/build_version.mjs latest",
-    "build:i2c-version": "node scripts/build_version.mjs i2c-version",
-    "build:gpio-version": "node scripts/build_version.mjs gpio-version",
-    "build:all": "node scripts/build_version.mjs latest && node scripts/build_version.mjs i2c-version && node scripts/build_version.mjs gpio-version"
+    "build:esp32-version": "node scripts/build_version.mjs esp32-version",
+    "build:imitation-learning-version": "node scripts/build_version.mjs imitation-learning-version",
+    "build:ros-version": "node scripts/build_version.mjs ros-version",
+    "build:all": "node scripts/build_version.mjs latest && node scripts/build_version.mjs esp32-version && node scripts/build_version.mjs imitation-learning-version && node scripts/build_version.mjs ros-version"
   },
   "dependencies": {
     "vitepress": "^1.6.4"

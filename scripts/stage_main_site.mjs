@@ -3,11 +3,12 @@ import { fileURLToPath } from 'url'
 import { dirname, join, extname, basename } from 'path'
 import { setTimeout as delay } from 'timers/promises'
 import sharp from 'sharp'
+import { projectName as defaultProjectName } from '../docs/.vitepress/site.config.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = join(__dirname, '..')
 
-const projectName = process.env.DOCS_PROJECT || '4-Ch-Knob-Line-Follower'
+const projectName = process.env.DOCS_PROJECT || defaultProjectName
 const version = process.env.DOCS_VERSION || process.argv[2]
 
 if (!version) {

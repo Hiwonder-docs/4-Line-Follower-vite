@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
+import { projectName } from '../site.config.mjs'
 
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -107,7 +108,7 @@ async function submitFeedback() {
     payload.append('email', form.email.trim())
     payload.append('message', form.message.trim())
     payload.append('website', form.website)
-    payload.append('source', '4-Ch-Knob-Line-Follower docs')
+    payload.append('source', `${projectName} docs`)
     payload.append('pageTitle', document.title)
     payload.append('pageUrl', window.location.href)
     payload.append('version', '')

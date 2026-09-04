@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { getSidebar } from './autoSidebar.mts'
 import mathjax3 from 'markdown-it-mathjax3'
+import { projectName, defaultVersion, getVersionBase } from './site.config.mjs'
 
 const problematicStrongEndingPattern = /[：；，。！？、（）【】《》「」『』“”‘’]$/u
 const problematicStrongOpeningPattern = /^[（(][^*\n]+?[）)]$/u
@@ -12,7 +13,7 @@ const fencePattern = /^\s*(```+|~~~+)/
 const lazyImagePlaceholder =
   'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%229%22 viewBox=%220 0 16 9%22%3E%3C/svg%3E'
 const imageDimensionCache = new Map<string, { width: number; height: number } | null>()
-const docsBase = normalizeBase(process.env.DOCS_BASE || '/projects/4-Ch-Knob-Line-Follower/en/latest/')
+const docsBase = normalizeBase(process.env.DOCS_BASE || getVersionBase(defaultVersion))
 
 function normalizeBase(value: string) {
   return `/${value.replace(/^\/+|\/+$/g, '')}/`
@@ -708,8 +709,8 @@ function docModuleBlockPlugin(md: any) {
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   base: docsBase,
-  title: '4-Ch-Knob-Line-Follower Documentation',
-  description: '4-Ch-Knob-Line-Follower documentation',
+  title: `${projectName} Documentation`,
+  description: `${projectName} documentation`,
   head: [['link', { rel: 'icon', href: `${docsBase}favicon.ico` }]],
   ignoreDeadLinks: true,
   transformHtml(code) {

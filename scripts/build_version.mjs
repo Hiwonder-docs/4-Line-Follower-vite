@@ -1,7 +1,8 @@
-import { rm, cp, readFile, writeFile } from 'fs/promises'
+import { rm, cp, readFile, writeFile, access } from 'fs/promises'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { execSync } from 'child_process'
+import { projectName, getVersionBase, getVersionNames } from '../docs/.vitepress/site.config.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = join(__dirname, '..')
@@ -13,21 +14,21 @@ if (!version) {
   process.exit(1)
 }
 
-const validVersions = ['latest', 'gpio-version', 'i2c-version']
+const validVersions = getVersionNames()
 if (!validVersions.includes(version)) {
   console.error(`Invalid version: ${version}`)
   console.error(`Valid versions: ${validVersions.join(', ')}`)
   process.exit(1)
 }
 
-const contentDirName = version
-const projectName = '4-Ch-Knob-Line-Follower'
-const docsBase = `/projects/${projectName}/en/${version}/`
+const contentDirName = await resolveContentDirName(version)
+const docsBase = getVersionBase(version)
 const rootIndexPath = join(repositoryRoot, 'docs', 'index.md')
 const versionIndexPath = join(repositoryRoot, 'content', contentDirName, 'docs', 'index.md')
 
 console.log(`\n========== Building ${version} ==========`)
 console.log(`DOCS_BASE: ${docsBase}`)
+console.log(`CONTENT_SOURCE: content/${contentDirName}`)
 
 // 1. Copy content to docs working directory
 const contentDir = join(repositoryRoot, 'content', contentDirName)
@@ -60,10 +61,20 @@ try {
   execSync('node scripts/stage_main_site.mjs', {
     stdio: 'inherit',
     cwd: repositoryRoot,
-    env: { ...process.env, DOCS_VERSION: version }
+    env: { ...process.env, DOCS_PROJECT: projectName, DOCS_VERSION: version }
   })
 
   console.log(`\n========== ${version} build complete ==========\n`)
 } finally {
   await writeFile(rootIndexPath, originalRootIndex)
+}
+
+async function resolveContentDirName(contentDirName) {
+  try {
+    await access(join(repositoryRoot, 'content', contentDirName, 'docs', 'index.md'))
+    return contentDirName
+  } catch {}
+
+  console.error(`No content source found for ${version}: content/${contentDirName}`)
+  process.exit(1)
 }

@@ -1,7 +1,8 @@
-import { rm, cp, readFile, writeFile } from 'fs/promises'
+import { rm, cp, readFile, writeFile, access } from 'fs/promises'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { spawn } from 'child_process'
+import { getVersionBase, getVersionNames } from '../docs/.vitepress/site.config.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = join(__dirname, '..')
@@ -13,16 +14,15 @@ if (!version) {
   process.exit(1)
 }
 
-const validVersions = ['latest', 'gpio-version', 'i2c-version']
+const validVersions = getVersionNames()
 if (!validVersions.includes(version)) {
   console.error(`Invalid version: ${version}`)
   console.error(`Valid versions: ${validVersions.join(', ')}`)
   process.exit(1)
 }
 
-const contentDirName = version
-const projectName = '4-Ch-Knob-Line-Follower'
-const docsBase = `/projects/${projectName}/en/${version}/`
+const contentDirName = await resolveContentDirName(version)
+const docsBase = getVersionBase(version)
 const rootIndexPath = join(repositoryRoot, 'docs', 'index.md')
 const versionIndexPath = join(repositoryRoot, 'content', contentDirName, 'docs', 'index.md')
 const contentDir = join(repositoryRoot, 'content', contentDirName)
@@ -32,6 +32,7 @@ const vitepressArgs = ['vitepress', 'dev', 'docs', ...process.argv.slice(3)]
 
 console.log(`\n========== Starting dev server for ${version} ==========`)
 console.log(`DOCS_BASE: ${docsBase}`)
+console.log(`CONTENT_SOURCE: content/${contentDirName}`)
 
 const originalRootIndex = await readFile(rootIndexPath, 'utf8')
 const versionRootIndex = await readFile(versionIndexPath, 'utf8')
@@ -71,3 +72,13 @@ process.on('SIGINT', () => {
 process.on('SIGTERM', () => {
   devServer.kill('SIGTERM')
 })
+
+async function resolveContentDirName(contentDirName) {
+  try {
+    await access(join(repositoryRoot, 'content', contentDirName, 'docs', 'index.md'))
+    return contentDirName
+  } catch {}
+
+  console.error(`No content source found for ${version}: content/${contentDirName}`)
+  process.exit(1)
+}

@@ -1,6 +1,6 @@
-# 4-Ch-Knob-Line-Follower Documentation
+# NexArm Documentation
 
-This repository contains the 4-Ch-Knob-Line-Follower VitePress documentation site. The
+This repository contains the NexArm VitePress documentation site. The
 documentation source files are Markdown files under `docs/docs/`.
 
 ## Local development
@@ -9,17 +9,24 @@ Install dependencies and start the local documentation server:
 
 ```bash
 npm ci
-npm run docs:dev
+npm run dev:latest
 ```
 
-Build the production site and stage the artifacts:
+Other version dev commands:
 
 ```bash
-npm run docs:build
-npm run docs:stage-main
+npm run dev:esp32-version
+npm run dev:imitation-learning-version
+npm run dev:ros-version
 ```
 
-The staged production files are generated in `projects/4-Ch-Knob-Line-Follower/en/latest/`.
+Build and stage all production versions:
+
+```bash
+npm run build:all
+```
+
+The staged production files are generated under `projects/NexArm/en/<version>/`.
 
 ## GitHub Pages deployment
 
@@ -30,11 +37,11 @@ The build artifacts under `projects/` are committed to the repository. Open
 The GitHub Pages direct URL is:
 
 ```text
-https://GITHUB-USERNAME.github.io/4-Ch-Knob-Line-Follower-vite/projects/4-Ch-Knob-Line-Follower/en/latest/
+https://GITHUB-USERNAME.github.io/REPOSITORY-NAME/projects/NexArm/en/latest/
 ```
 
 The public-facing URL (via the baota Nginx reverse proxy) is:
 
 ```text
-https://wiki-test.hiwonder.com/projects/4-Ch-Knob-Line-Follower/en/latest/
+https://wiki-test.hiwonder.com/projects/NexArm/en/latest/
 ```
