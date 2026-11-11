@@ -2,7 +2,7 @@ import { rm, cp, readFile, writeFile, access } from 'fs/promises'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { execSync } from 'child_process'
-import { projectName, getVersionBase, getVersionNames } from '../docs/.vitepress/site.config.mjs'
+import { projectSlug as projectName, getVersionBase, getVersionNames } from '../docs/.vitepress/site.config.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = join(__dirname, '..')

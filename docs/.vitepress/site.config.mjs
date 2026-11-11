@@ -1,4 +1,5 @@
-export const projectName = 'NexArm'
+export const projectName = '4-Ch Knob Line Follower'
+export const projectSlug = '4-Ch-Knob-Line-Follower'
 export const defaultVersion = 'latest'
 
 export const versionDefinitions = [
@@ -8,24 +9,19 @@ export const versionDefinitions = [
     entryPath: '/docs/1_NexArm_Tutorial.html'
   },
   {
-    version: 'esp32-version',
-    label: 'ESP32 Version',
-    entryPath: '/docs/1_Getting_Started_NexArm.html'
+    version: 'gpio-version',
+    label: 'GPIO Version',
+    entryPath: '/docs/1_4-Ch_Line_Follower_Sensor_Overview.html'
   },
   {
-    version: 'imitation-learning-version',
-    label: 'Imitation Learning Version',
-    entryPath: '/docs/1_Getting_Started_NexArm.html'
-  },
-  {
-    version: 'ros-version',
-    label: 'ROS Version',
-    entryPath: '/docs/1. NexArm User Manual.html'
+    version: 'i2c-version',
+    label: 'I2C Version',
+    entryPath: '/docs/1_4-Ch_Line_Follower_Sensor_Overview.html'
   }
 ]
 
 export function getVersionBase(version = defaultVersion) {
-  return `/projects/${projectName}/en/${version}/`
+  return `/projects/${projectSlug}/en/${version}/`
 }
 
 export function getVersionDefinition(version) {

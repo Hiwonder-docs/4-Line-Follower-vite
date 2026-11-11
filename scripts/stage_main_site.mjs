@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url'
 import { dirname, join, extname, basename } from 'path'
 import { setTimeout as delay } from 'timers/promises'
 import sharp from 'sharp'
-import { projectName as defaultProjectName } from '../docs/.vitepress/site.config.mjs'
+import { projectSlug as defaultProjectName } from '../docs/.vitepress/site.config.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = join(__dirname, '..')
