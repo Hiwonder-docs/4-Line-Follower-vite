@@ -6,16 +6,18 @@ export const versionDefinitions = [
   {
     version: 'latest',
     label: 'Latest',
-    entryPath: '/docs/1_NexArm_Tutorial.html'
+    entryPath: '/docs/index.html'
   },
   {
     version: 'gpio-version',
     label: 'GPIO Version',
+    description: 'GPIO interface documentation',
     entryPath: '/docs/1_4-Ch_Line_Follower_Sensor_Overview.html'
   },
   {
     version: 'i2c-version',
     label: 'I2C Version',
+    description: 'I2C interface documentation',
     entryPath: '/docs/1_4-Ch_Line_Follower_Sensor_Overview.html'
   }
 ]

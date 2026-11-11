@@ -1,8 +1,10 @@
 import DefaultTheme from 'vitepress/theme'
 import { defineComponent, h, nextTick, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useData, useRoute } from 'vitepress'
+import type { Theme } from 'vitepress'
 import './custom.css'
 import Layout from './Layout.vue'
+import KitVersionGuide from './KitVersionGuide.vue'
 
 function collectLockedLinks(items: any[], links = new Set<string>()) {
   for (const item of items || []) {
@@ -102,6 +104,9 @@ const LockedSidebarMarker = defineComponent({
 
 export default {
   ...DefaultTheme,
+  enhanceApp({ app }: Parameters<NonNullable<Theme['enhanceApp']>>[0]) {
+    app.component('KitVersionGuide', KitVersionGuide)
+  },
   Layout: () => h(Layout, null, { 'layout-bottom': () => h(LockedSidebarMarker) }),
 }
 

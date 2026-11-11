@@ -1,6 +1,7 @@
----
-layout: page-redirect
-redirectTo: /docs/1_NexArm_Tutorial.html
----
+# 4-Ch Knob Line Follower
 
-Redirecting to content page...
+> [!NOTE]
+>
+> Select the GPIO or I2C version for your module. You can switch versions anytime using the Version menu in the navigation bar.
+
+<KitVersionGuide />
